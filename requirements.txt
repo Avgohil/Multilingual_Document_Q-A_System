@@ -1,0 +1,13 @@
+pdfplumber
+pymupdf
+langdetect
+deep-translator
+sentence-transformers
+faiss-cpu
+numpy
+transformers
+torch
+requests
+beautifulsoup4
+langid
+scikit-learn
