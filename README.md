@@ -108,14 +108,15 @@ User uploads PDF → server saves it → extracts text → sends 300-word previe
 Below are screenshots of the running Streamlit frontend and sample QA outputs.
 
 <p align="center">
-<img src="Screenshots/Screenshot%202025-11-20%20170124.png" width="700"/>
-<br/>
-<img src="Screenshots/Screenshot%202025-11-20%20171354.png" width="700"/>
-<br/>
 <img src="Screenshots/Screenshot%202025-11-20%20171403.png" width="700"/>
 <br/>
 <img src="Screenshots/Screenshot%202025-11-20%20171524.png" width="700"/>
 <br/>
+<img src="Screenshots/Screenshot%202025-11-20%20170124.png" width="700"/>
+<br/>
+<img src="Screenshots/Screenshot%202025-11-20%20171354.png" width="700"/>
+<br/>
+
 <img src="Screenshots/Screenshot%202025-11-20%20171741.png" width="700"/>
 <br/>
 <img src="Screenshots/Screenshot%202025-11-20%20172039.png" width="700"/>
