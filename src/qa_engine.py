@@ -107,3 +107,71 @@ def answer_question(question: str, full_text: str) -> Dict[str, str]:
             "answer_en": "Answer not found",
             "final_answer": "Answer not found",
         }
+
+def answer_question_multi(question: str, index, embeddings, metadata) -> dict:
+    """Multi-document QA with source citation."""
+    
+    detected = "unknown"
+    final_answer = "Answer not found"
+    sources = []
+
+    try:
+        from language_utils import detect_language, translate_to_english, translate_to_language
+        from retrieval_utils import retrieve_from_multi_doc
+
+        detected = detect_language(question)
+        translated_q = translate_to_english(question) if detected != "en" else question
+
+        # Retrieve from all docs
+        results = retrieve_from_multi_doc(translated_q, index, embeddings, metadata, top_k=5)
+
+        if not results:
+            return {
+                "detected_language": detected,
+                "final_answer": "Answer not found",
+                "sources": []
+            }
+
+        # Prepare context with source labels
+        context_parts = []
+        for r in results:
+            context_parts.append(f"[From: {r['source']}]\n{r['chunk']}")
+        context = "\n\n".join(context_parts)
+
+        # Sources list (unique filenames)
+        sources = list(set(r["source"] for r in results))
+
+        prompt = f"""You are a helpful research assistant. Answer the question ONLY using the PDF excerpts below.
+For each point in your answer, mention which document it came from.
+If the answer is not present, say: "Answer not found in documents."
+
+PDF Excerpts:
+{context}
+
+Question: {translated_q}
+
+Answer:"""
+
+        ok, answer_en = _call_llm(prompt)
+        if not ok:
+            return {
+                "detected_language": detected,
+                "final_answer": "Answer not found",
+                "sources": sources
+            }
+
+        final_answer = translate_to_language(answer_en, detected) if detected not in ["unknown", "en"] else answer_en
+
+        return {
+            "detected_language": detected,
+            "final_answer": final_answer,
+            "sources": sources
+        }
+
+    except Exception as e:
+        print("Multi QA Error:", e)
+        return {
+            "detected_language": detected,
+            "final_answer": "Answer not found",
+            "sources": sources
+        }

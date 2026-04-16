@@ -148,3 +148,68 @@ def retrieve_top_chunks(
     except Exception:
         # On any error, return empty list rather than raising
         return []
+
+def build_multi_doc_store(doc_texts: dict) -> Tuple[faiss.IndexFlatL2, np.ndarray, List[dict]]:
+    """
+    Build a FAISS index from multiple documents.
+    
+    Args:
+        doc_texts: {"filename.pdf": "full text...", ...}
+    
+    Returns:
+        (faiss_index, embeddings, metadata_list)
+        metadata_list = [{"chunk": "...", "source": "filename.pdf", "chunk_id": 0}, ...]
+    """
+    all_chunks = []
+    metadata = []
+
+    for filename, text in doc_texts.items():
+        chunks = split_into_chunks(text)
+        for i, chunk in enumerate(chunks):
+            all_chunks.append(chunk)
+            metadata.append({
+                "chunk": chunk,
+                "source": filename,
+                "chunk_id": i
+            })
+
+    if not all_chunks:
+        raise ValueError("No chunks found in documents")
+
+    index, embeddings = build_vector_store(all_chunks)
+    return index, embeddings, metadata
+
+
+def retrieve_from_multi_doc(
+    query: str,
+    index: faiss.IndexFlatL2,
+    embeddings: np.ndarray,
+    metadata: List[dict],
+    top_k: int = 5,
+) -> List[dict]:
+    """
+    Retrieve top-k chunks from multi-doc store with source info.
+    
+    Returns:
+        [{"chunk": "...", "source": "filename.pdf", "score": 0.91}, ...]
+    """
+    if not query or not metadata:
+        return []
+
+    chunks = [m["chunk"] for m in metadata]
+    results = retrieve_top_chunks(query, index, embeddings, chunks, top_k)
+
+    enriched = []
+    for chunk_text, score in results:
+        # Find matching metadata
+        for m in metadata:
+            if m["chunk"] == chunk_text:
+                enriched.append({
+                    "chunk": chunk_text,
+                    "source": m["source"],
+                    "chunk_id": m["chunk_id"],
+                    "score": round(score, 3)
+                })
+                break
+
+    return enriched
