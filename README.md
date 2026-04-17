@@ -1,150 +1,101 @@
-# Multilingual PDF Question Answering System
+# 🔬 Multilingual Document Q&A Research Assistant
 
-**A fast, lightweight Retrieval-Augmented PDF Question Answering system built with FastAPI, Streamlit, FAISS & FLAN-T5.**
+A production-ready AI-powered research assistant that allows users to upload multiple PDFs and ask questions in any language — with cited answers and document summaries.
 
----
+## 🚀 Features
 
-## Overview
+- **Multi-Document Search** — Upload multiple PDFs and search across all of them simultaneously
+- **Multilingual Support** — Ask questions in Hindi, Gujarati, English, Spanish, or any language
+- **Source Citations** — Every answer mentions which document it came from
+- **Chat Memory** — Ask follow-up questions with conversation context
+- **Document Summarizer** — Generate structured summaries with key points
+- **Powered by Groq LLaMA3** — Fast, accurate, GPT-4 level answers (free API)
 
-This project allows users to:
+## 🛠️ Tech Stack
 
-- Upload any PDF
-- View a 300-word preview
-- Ask questions in any language (Gujarati, Hindi, English, etc.)
-- Get answers using Retrieval-Augmented Generation (RAG)
-- Use a clean Streamlit UI + FastAPI backend
+| Layer | Technology |
+|-------|-----------|
+| LLM | Groq LLaMA 3.3 70B |
+| Embeddings | sentence-transformers (all-MiniLM-L6-v2) |
+| Vector Store | FAISS |
+| Backend | FastAPI |
+| Frontend | Streamlit |
+| PDF Extraction | pdfplumber + PyMuPDF |
+| Translation | deep-translator |
+| Language Detection | langdetect |
 
-All processing runs locally — no paid API required.
+## 📁 Project Structure
 
-## Features
-
-- PDF text extraction (`pdfplumber`)
-- 300-word preview generator
-- Sentence-Transformers embeddings (`all-MiniLM-L6-v2`)
-- FAISS vector similarity search
-- FLAN-T5-Small LLM for answer generation
-- Multilingual question support (auto-translate)
-- Streamlit UI for interaction
-- FastAPI backend API
-- Works offline after model download (CPU-friendly)
-
-## Project Structure
-
-```
-DSAProject/
-│
+Multilingual_Document_Q-A_System/
 ├── backend/
-│   ├── fast_api.py           # /upload-preview endpoint
-│   └── question_api.py       # /ask-question endpoint
-│
-├── frontend/
-│   └── app.py                # Streamlit UI
-│
+│   ├── fast_api.py         # FastAPI app
+│   ├── question_api.py     # QA + Summarize endpoints
+│   
 ├── src/
-│   ├── pdf_extractor.py      # PDF extraction + preview
-│   ├── language_utils.py     # Language detection + translation
-│   ├── retrieval_utils.py    # Chunking + embeddings + FAISS
-│   └── qa_engine.py          # Full QA pipeline
-│
-├── data/uploads/             # Uploaded PDFs
-├── sample_pdfs/              # Sample test PDFs
+│   ├── qa_engine.py        # Groq LLM integration
+│   ├── retrieval_utils.py  # FAISS vector store
+│   ├── pdf_extractor.py    # PDF text extraction
+│   └── language_utils.py   # Translation & detection
+├── frontend/
+│   └── app.py              # Streamlit UI
+├── data/uploads/           # Uploaded PDFs
 └── requirements.txt
-```
 
-## System Architecture (RAG Pipeline)
-```
-Streamlit UI→ FastAPI → PDF Extraction → Chunking & Embeddings → FAISS Retrieval → FLAN-T5 Answer Generation
-```
-## Installation (Windows)
+## ⚙️ Setup & Run
 
-1. Create virtual environment
-
-```bat
-python -m venv venv
-venv\Scripts\activate
-```
-
-2. Install dependencies
-
-```bat
+### 1. Clone & Setup
+```bash
+git clone https://github.com/Avgohil/Multilingual_Document_Q-A_System
+cd Multilingual_Document_Q-A_System
+python -m venv .venv
+.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-## Running the Project
+### 2. Add Groq API Key
+Create `.env` file in root:
+GROQ_API_KEY=your_groq_api_key_here
 
-Start the backend (FastAPI + Uvicorn):
+Get free key at: https://console.groq.com
 
-```bat
+### 3. Run Backend
+```bash
 uvicorn backend.fast_api:app --reload --port 8000
 ```
 
-Start the frontend (Streamlit):
-
-```bat
+### 4. Run Frontend
+```bash
 streamlit run frontend/app.py
 ```
 
-## How It Works
+### 5. Open Browser
+- Frontend: http://localhost:8501
+- API Docs: http://127.0.0.1:8000/docs
 
-1) PDF Upload
+## 🎯 How to Use
 
-- User uploads a PDF via Streamlit
-- Backend saves it to `data/uploads/`
-- Extracts text using `pdfplumber`
-- Returns 300-word preview
+1. Upload one or more PDF documents
+2. Ask questions in any language
+3. Get cited answers showing which document answered
+4. Use "Summarize" to get structured document summary
+5. Ask follow-up questions — system remembers context
 
-2) Question Answering Process
+## 🏆 Project Highlights
 
-- Detect input language
-- Translate → English (if needed)
-- Split PDF into chunks
-- Create embeddings with Sentence-Transformers
-- Search relevant chunks via FAISS
-- Build prompt with top-k chunks
-- FLAN-T5 generates the answer
-- Translate back to original language (if needed)
-- Return final answer
+- **RAG Pipeline** — Retrieval Augmented Generation for accurate answers
+- **Semantic Search** — FAISS vector similarity search
+- **Cross-lingual QA** — Detect → Translate → Answer → Translate back
+- **Production Ready** — Clean API structure, error handling, modular code
 
-## Tech Stack:
+## 📊 Architecture
 
-- **LLM / Answer Generator:** `google/flan-t5-small` (via `transformers` + `torch`) — lightweight and CPU-friendly.
-- **Retrieval & Embeddings:** `sentence-transformers` (`all-MiniLM-L6-v2`) and `faiss-cpu`.
-- **PDF Processing:** `pdfplumber`, `pymupdf` (optional).
-- **Language Processing:** `langdetect` / `langid` (fallback), `deep-translator` (GoogleTranslator).
-- **Backend:** `FastAPI`, `uvicorn`.
-- **Frontend:** `Streamlit` (UI) + `requests` (client calls).
-- **Utilities:** `numpy`, `scikit-learn`, and other dependencies listed in `requirements.txt`.
-
-## Screenshots
-
-<details>
-<summary>📷 Click to view screenshots</summary>
-
-<p align="center">
-	<img src="Screenshots/Screenshot%202025-11-20%20171403.png" width="700"/>
-	<br/>
-	<img src="Screenshots/Screenshot%202025-11-20%20171524.png" width="700"/>
-	<br/>
-	<img src="Screenshots/Screenshot%202025-11-20%20170124.png" width="700"/>
-	<br/>
-	<img src="Screenshots/Screenshot%202025-11-20%20171354.png" width="700"/>
-	<br/>
-	<img src="Screenshots/Screenshot%202025-11-20%20171741.png" width="700"/>
-	<br/>
-	<img src="Screenshots/Screenshot%202025-11-20%20172039.png" width="700"/>
-	<br/>
-	<img src="Screenshots/Screenshot%202025-11-20%20172119.png" width="700"/>
-	<br/>
-	<img src="Screenshots/Screenshot%202025-11-20%20172646.png" width="700"/>
-</p>
-
-</details>
-
-
-**Submitted By**
-
-Name: Ankita Gohil
-Project: Multilingual PDF Document QA System
-Role: Engineering Student (7th Sem)
-
+User Question → Language Detection → English Translation
+↓
+FAISS Semantic Search across all uploaded PDFs
+↓
+Top-K relevant chunks retrieved with source info
+↓
+Groq LLaMA3 generates cited answer
+↓
+Answer translated back to user's language
 

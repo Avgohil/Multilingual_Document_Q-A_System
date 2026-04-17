@@ -11,3 +11,7 @@ requests
 beautifulsoup4
 langid
 scikit-learn
+fastapi
+uvicorn
+streamlit
+python-multipart

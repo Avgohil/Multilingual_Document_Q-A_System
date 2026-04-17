@@ -135,11 +135,13 @@ def answer_question_multi(question: str, index, embeddings, metadata) -> dict:
         # Prepare context with source labels
         context_parts = []
         for r in results:
-            context_parts.append(f"[From: {r['source']}]\n{r['chunk']}")
+            clean_name = r['source'].split('_', 1)[-1]  # hash remove
+            context_parts.append(f"[From: {clean_name}]\n{r['chunk']}")
+
         context = "\n\n".join(context_parts)
 
         # Sources list (unique filenames)
-        sources = list(set(r["source"] for r in results))
+        sources = list(set(r["source"].split("_", 1)[-1] for r in results))
 
         prompt = f"""You are a helpful research assistant. Answer the question ONLY using the PDF excerpts below.
 For each point in your answer, mention which document it came from.
